@@ -2,55 +2,19 @@
 require(plyr)
 require(ggplot2)
 
-##Designate the subject librarian
-lib<-c("Cherie")
+##Designate a name for the areas of interest or person responsible for managing them
+lib<-c("name")
 
 ##Designate relevant sections
-s1<-c("QD")
-s1range<-c(1:999)
-s2<-c("R")
-s2range<-c(856:857)
-s3<-c("RE")
-s3range<-c(991:994)
-s4<-c("RF")
-s4range<-c(53:55)
-s5<-c("RG")
-s5range<-c(125:132)
-s6<-c("RJ")
-s6range<-c(560:570)
-s7<-c("RK")
-s7range<-c(701:715)
-s8<-c("RL")
-s8range<-c(801:803)
-s9<-c("RM")
-s9range<-c(1:950)
-s10<-c("RS")
-s10range<-c(1:441)
-s11<-c("TA")
-s11range<-c(1:165, 174:200, 329:348, 368:500)
-s12<-c("TD")
-s12range<-c(193)
-s13<-c("TP")
-s13range<-c(1:367, 480:499, 670:1185)
+sn<-c("LC")
+snrange<-c(num:num)
 
 ##Create a vector containing all desired call numbers
-match<-c(paste(s1, s1range), paste(s2, s2range), paste(s3, s3range), paste(s4, s4range), paste(s5, s5range), paste(s6, s6range), paste(s7, s7range), paste(s8, s8range), paste(s9, s9range), paste(s10, s10range), paste(s11, s11range), paste(s12, s12range), paste(s13, s13range))
+match<-c(paste(sn, snrange), paste(sn, snrange))
 
 ##Read in and merge descriptor files
-S1<-read.csv("QDDescriptors.csv")
-S2<-read.csv("RDescriptors.csv")
-S3<-read.csv("REDescriptors.csv")
-S4<-read.csv("RFDescriptors.csv")
-S5<-read.csv("RGDescriptors.csv")
-S6<-read.csv("RJDescriptors.csv")
-S7<-read.csv("RKDescriptors.csv")
-S8<-read.csv("RLDescriptors.csv")
-S9<-read.csv("RMDescriptors.csv")
-S10<-read.csv("RSDescriptors.csv")
-S11<-read.csv("TADescriptors.csv")
-S12<-read.csv("TDDescriptors.csv")
-S13<-read.csv("TPDescriptors.csv")
-descriptors<-rbind(S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12, S13)
+Sn<-read.csv("descriptor.csv")
+descriptors<-rbind(Sn, Sn)
 
 ##Read in approval books data
 approval<-read.csv("Approval.csv")
@@ -145,31 +109,31 @@ sum<-merge(sum, illcount, by="Description", all=TRUE)
 sum[c("Approval_Circ", "Firm_Circ", "Circ")][is.na(sum[c("Approval_Circ", "Firm_Circ", "Circ")])]<-0
 
 ##Calculate use for firm and approvals, and complete ratio calculations for all items combined
-##Approvals
-sum$aUse<-sum$Approval_Circ/sum$Approval_Items
-sum$aUse<-gsub("NaN", "0", sum$aUse)
-circ<-sum(sum$Circ)
-items<-sum(sum$Items)
-sum$aUse_R<-((sum$Approval_Circ/circ)/(sum$Approval_Items/items))
-sum$aUse_R<-gsub("NaN", "0", sum$aUse_R)
-sum$aRating<-c("Underused")
-sum$aRating[sum$aUse_R>1]<-c("Overused")
+  ##Approvals
+  sum$aUse<-sum$Approval_Circ/sum$Approval_Items
+  sum$aUse<-gsub("NaN", "0", sum$aUse)
+  circ<-sum(sum$Circ)
+  items<-sum(sum$Items)
+  sum$aUse_R<-((sum$Approval_Circ/circ)/(sum$Approval_Items/items))
+  sum$aUse_R<-gsub("NaN", "0", sum$aUse_R)
+  sum$aRating<-c("Underused")
+  sum$aRating[sum$aUse_R>1]<-c("Overused")
 
-##Firm Orders
-sum$fUse<-sum$Firm_Circ/sum$Firm_Items
-sum$fUse<-gsub("NaN", "0", sum$fUse)
-sum$fUse_R<-((sum$Firm_Circ/circ)/(sum$Firm_Items/items))
-sum$fUse_R<-gsub("NaN", "0", sum$fUse_R)
-sum$fRating<-c("Underused")
-sum$fRating[sum$fUse_R>1]<-c("Overused")
+  ##Firm Orders
+  sum$fUse<-sum$Firm_Circ/sum$Firm_Items
+  sum$fUse<-gsub("NaN", "0", sum$fUse)
+  sum$fUse_R<-((sum$Firm_Circ/circ)/(sum$Firm_Items/items))
+  sum$fUse_R<-gsub("NaN", "0", sum$fUse_R)
+  sum$fRating<-c("Underused")
+  sum$fRating[sum$fUse_R>1]<-c("Overused")
 
-##Combined
-sum$P_Items<-sum$Items/(sum(sum$Items))
-sum$P_Checkouts<-sum$Circ/(sum(sum$Circ))
-sum$Use<-sum$P_Checkouts/sum$P_Items
-sum$Use<-gsub("NaN", "0", sum$Use)
-sum$Rating<-c("Underused")
-sum$Rating[sum$Use>1]<-c("Overused")
+  ##Combined
+  sum$P_Items<-sum$Items/(sum(sum$Items))
+  sum$P_Checkouts<-sum$Circ/(sum(sum$Circ))
+  sum$Use<-sum$P_Checkouts/sum$P_Items
+  sum$Use<-gsub("NaN", "0", sum$Use)
+  sum$Rating<-c("Underused")
+  sum$Rating[sum$Use>1]<-c("Overused")
 
 ##Create percentage columns for the count of ill requests and relating the number of requests to the total number of items (combined)
 sum$P_Requests<-sum$Requests/(sum(sum$Requests))
@@ -198,33 +162,9 @@ sum$P_Recommendation[sum$Rating=="Overused" & sum$ILL_Rating %in% c("High Demand
 sum$P_Recommendation[sum$Rating=="Underused" & sum$ILL_Rating %in% c("High Demand", "Very High Demand", "Extremely High Demand")]<-c("Change in Purchasing")
 sum$P_Recommendation[sum$Rating=="Overused" & sum$ILL_Rating=="Low Demand"]<-c("No Changes")
 
-##Create a numerical field to denote reliability
-sum$R_Calc<-5
-sum$R_Calc1<-0
-sum$R_Calc1[sum$Items<20]<-2
-sum$R_Calc1[sum$Items<10]<-3
-sum$R_Calc2<-0
-sum$R_Calc2[sum$Firm_Items<10]<-1
-sum$R_Calc3<-0
-sum$R_Calc3[sum$Approval_Items<10]<-1
-sum$R_Calc4<-0
-sum$R_Calc4[sum$Approval_Circ==0]<-1
-sum$R_Calc4[sum$Firm_Circ==0]<-1
-sum$R_Calc4[sum$Circ==0]<-5
-sum$R_Calc<-sum$R_Calc-(sum$R_Calc1+sum$R_Calc2+sum$R_Calc3+sum$R_Calc4)
-
-##Convert the numerical reliability into a a rating
-sum$Reliability<-c("Moderate")
-sum$Reliability[sum$R_Calc<=-3]<-c("Very Low")
-sum$Reliability[sum$R_Calc<=0 & sum$R_Calc>=-2]<-c("Low")
-sum$Reliability[sum$R_Calc>=4]<-c("High")
-
-##Remove reliability calculation fields
-sum<-sum[-c(28:31)]
-
 ##Reorder the columns
 sum<-sum[c(1:11,13:14,16:24,26,12,15,25,27:28)]
 
 ##Write to an excel file
-write.csv(sum, paste(lib, "TestSummary.csv", sep=""))
+write.csv(sum, paste(lib, "Summary.csv", sep=""))
 
